@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import model.InvoiceType;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -17,6 +15,5 @@ public class ChannelForm {
     private String name;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     private InvoiceType invoiceType;
 }

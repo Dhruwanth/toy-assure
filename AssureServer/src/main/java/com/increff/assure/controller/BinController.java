@@ -4,10 +4,10 @@ import com.increff.assure.dto.BinDto;
 import com.increff.assure.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import model.data.BinSkuData;
 import model.form.BinSkuForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +23,7 @@ public class BinController {
 
     @ApiOperation(value = "Create specified number of Bins")
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public List<Long> add(@RequestParam Integer numberOfBins) throws ApiException {
+    public List<Long> add(@RequestBody Integer numberOfBins) throws ApiException {
         return binDto.add(numberOfBins);
     }
 
@@ -39,4 +39,15 @@ public class BinController {
         binDto.addBinWiseInventory(formList);
     }
 
+    @ApiOperation(value = "Search Bin Inventory")
+    @RequestMapping(path = "/binSku/search", method = RequestMethod.POST)
+    public List<BinSkuData> getSearchByBinAndProduct(@RequestBody BinSkuForm form) throws ApiException {
+        return binDto.getSearchByBinAndProduct(form.getBinId(), form.getGlobalSkuId());
+    }
+
+    @ApiOperation(value = "Validate Bin Inventory list.")
+    @RequestMapping(path = "/binSku/validate", method = RequestMethod.POST)
+    public void validateList(@RequestBody List<BinSkuForm> formList) throws ApiException {
+        binDto.validateFormList(formList);
+    }
 }

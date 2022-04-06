@@ -2,20 +2,20 @@ package com.increff.assure.service;
 
 import com.increff.assure.dao.ProductDao;
 import com.increff.assure.pojo.ProductPojo;
-import model.form.ProductUpdateForm;
-import model.data.ProductData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional(rollbackFor = ApiException.class)
 public class ProductService extends AbstractService {
     @Autowired
     private ProductDao productDao;
 
-    @Transactional(rollbackFor = ApiException.class)
     public void add(ProductPojo product) throws ApiException {
         checkIfProductExists(product.getClientId(), product.getClientSkuId());
         productDao.insert(product);
@@ -31,6 +31,11 @@ public class ProductService extends AbstractService {
         return product;
     }
 
+    public Map<Long, ProductPojo> getByGlobalSkuIds(List<Long> globalSkuIds){
+        return productDao.selectByGlobalSkuIds(globalSkuIds).stream().collect(Collectors.
+                toMap(value ->value.getId(), value->value));
+    }
+
     @Transactional(rollbackFor = ApiException.class)
     public void addList(List<ProductPojo> productList) throws ApiException {
         for (ProductPojo pojo : productList)
@@ -41,9 +46,12 @@ public class ProductService extends AbstractService {
         return productDao.selectAll();
     }
     
-    @Transactional(rollbackFor = ApiException.class)
-    public void update(Long clientId, String clientSkuId, ProductUpdateForm productForm) throws ApiException {
-        copySourceToDestination(productDao.selectByClientIdAndClientSku(clientId, clientSkuId), productForm);
+    public void update(Long id, ProductPojo updated) throws ApiException {
+        ProductPojo existing = getCheckId(id);
+        existing.setDescription(updated.getDescription());
+        existing.setBrandId(updated.getBrandId());
+        existing.setMrp(updated.getMrp());
+        existing.setName(updated.getName());
     }
 
     public Long getClientIdOfProduct(Long globalSkuId) throws ApiException {

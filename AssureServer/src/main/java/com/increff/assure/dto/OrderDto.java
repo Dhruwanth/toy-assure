@@ -5,14 +5,14 @@ import com.increff.assure.pojo.*;
 import com.increff.assure.service.*;
 import com.increff.assure.util.DateUtil;
 import com.increff.assure.util.PdfGenerateUtil;
-import com.increff.assure.util.XmlGenerateUtil;
-import model.ConsumerType;
+import com.increff.assure.util.XmlUtil;
+import model.PartyType;
 import model.InvoiceType;
 import model.OrderStatus;
 import model.data.OrderData;
 import model.data.OrderItemData;
-import model.data.OrderItemReceiptData;
-import model.data.OrderReceiptData;
+import model.data.OrderItemInvoiceData;
+import model.data.OrderInvoiceData;
 import model.form.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,6 @@ public class OrderDto extends AbstractDto {
     @Autowired
     private ClientWrapper clientWrapper;
 
-    @Transactional(rollbackFor = ApiException.class)
     public void add(OrderForm orderForm) throws ApiException {
         checkValid(orderForm);
 
@@ -55,11 +54,10 @@ public class OrderDto extends AbstractDto {
         validateOrder(orderPojo);
         orderService.add(orderPojo);
 
-        addOrderItemsForOrder(orderForm.getOrderItemList(), orderPojo.getId(), orderPojo.getClientId());
+        addOrderItemsForOrder(orderForm.getOrderItemList(), orderPojo.getId(), orderPojo.getClientId());//TODO refactor this method(change validation mechanism)
     }
 
-    @Transactional(rollbackFor = ApiException.class)
-    public void add(ChannelOrderForm orderForm) throws ApiException {
+    public void addOrderFromChannel(ChannelOrderForm orderForm) throws ApiException {
         checkValid(orderForm);
 
         OrderPojo orderPojo = convert(orderForm, OrderPojo.class);
@@ -79,11 +77,10 @@ public class OrderDto extends AbstractDto {
     private void addChannelOrderItemsForOrder(List<ChannelOrderItemForm> orderItemFormList, Long channelId, Long orderId, Long clientId) throws ApiException {
         List<OrderItemPojo> orderItemList = convertFormToPojo(orderItemFormList, channelId, orderId, clientId);
         for (OrderItemPojo orderItem : orderItemList)
-            validateOrderItem(orderItem);
+            validateOrderItem(orderItem);// do all validations together
         orderItemService.addList(orderItemList);
     }
 
-    @Transactional(readOnly = true)
     public void validateOrderItem(OrderItemPojo orderItemPojo) throws ApiException {
         productService.getCheckId(orderItemPojo.getGlobalSkuId());
 
@@ -97,14 +94,8 @@ public class OrderDto extends AbstractDto {
                     "Channel does not provide the mentioned Product");
     }
 
-    @Transactional(readOnly = true)
     public OrderData get(Long id) throws ApiException {
         return convertPojoToData(orderService.getCheckId(id));
-    }
-
-    @Transactional(readOnly = true)
-    public List<OrderData> getAll() throws ApiException {
-        return convertPojoToData(orderService.getAll());
     }
 
     public boolean isOrderAllocated(Long orderId) {
@@ -117,16 +108,16 @@ public class OrderDto extends AbstractDto {
 
     @Transactional(rollbackFor = ApiException.class)
     public void runAllocation(Long orderId) throws ApiException {
-        checkFalse(orderService.getCheckId(orderId).getStatus().equals(OrderStatus.ALLOCATED), "Order is already ALLOCATED");
+        checkFalse(orderService.getCheckId(orderId).getStatus().equals(OrderStatus.ALLOCATED), "Order is already ALLOCATED");//This error should not be there(idempotency)
         checkFalse(orderService.getCheckId(orderId).getStatus().equals(OrderStatus.FULFILLED), "Cannot Allocate FULFILLED Order");
 
-        long globalSkuOfOrderItem, orderedQuantity, allocatedOrderItemQuantity;
+        long globalSkuOfOrderItem, orderedQuantity, allocatedOrderItemQuantity;//change orderedquantity to quantitytoallocate
 
         for (OrderItemPojo orderItem : orderItemService.getByOrderId(orderId)) {
             globalSkuOfOrderItem = orderItem.getGlobalSkuId();
             orderedQuantity = orderItem.getOrderedQuantity() - orderItem.getAllocatedQuantity();
 
-            allocatedOrderItemQuantity = allocateFromAllBins(globalSkuOfOrderItem, orderedQuantity);
+            allocatedOrderItemQuantity = binSkuService.allocateFromAllBins(globalSkuOfOrderItem, orderedQuantity);
             if (allocatedOrderItemQuantity == 0)
                 continue;
             inventoryService.allocateAvailableItems(globalSkuOfOrderItem, allocatedOrderItemQuantity);
@@ -135,72 +126,41 @@ public class OrderDto extends AbstractDto {
         updateOrderStatusToAllocated(orderId);
     }
 
-    @Transactional(rollbackFor = ApiException.class)
     public void updateOrderStatusToAllocated(Long orderId) throws ApiException {
         if (isOrderAllocated(orderId))
             orderService.updateStatus(orderId, OrderStatus.ALLOCATED);
     }
 
-    @Transactional(rollbackFor = ApiException.class)
-    public Long allocateFromAllBins(Long globalSku, Long quantityToAllocate) {
-        Long remainingQuantityToAllocate = quantityToAllocate;
-        List<BinSkuPojo> allBinSkus = binSkuService.selectBinsByGlobalSku(globalSku);
-        sortByQuantity(allBinSkus);
-
-        for (BinSkuPojo binSkuPojo : allBinSkus) {
-            remainingQuantityToAllocate = binSkuService.removeFromBin(binSkuPojo, remainingQuantityToAllocate);
-            if (remainingQuantityToAllocate == 0) return quantityToAllocate;
-        }
-        return quantityToAllocate - remainingQuantityToAllocate;
-    }
-
-    private void sortByQuantity(List<BinSkuPojo> allBinSkus) {
-        allBinSkus.sort((bin1, bin2) -> (bin2.getQuantity()).compareTo(bin1.getQuantity()));
-    }
-
-    @Transactional(rollbackFor = ApiException.class)
     public String fulfillOrder(Long orderId) throws ApiException, JsonProcessingException {
         OrderPojo order = orderService.getCheckId(orderId);
         checkFalse(order.getStatus().equals(OrderStatus.CREATED), "Order is not Allocated");
 
         if (order.getStatus().equals(OrderStatus.ALLOCATED))
-            fulfillOrderItems(orderId);
+            orderItemService.fulfillOrderItems(orderId);
 
         if (channelService.getInvoiceType(order.getChannelId()).equals(InvoiceType.SELF))
-            return Base64.getEncoder().encodeToString(generateInvoicePdf(order));
+            return Base64.getEncoder().encodeToString(generateInvoicePdf(order));//maintain idempotency for fulfilled orders
 
         return clientWrapper.fetchInvoiceFromChannel(createOrderInvoice(order));
     }
 
-    private void fulfillOrderItems(Long orderId) throws ApiException {
-        Long allocatedOrderItemQuantity;
-        for (OrderItemPojo orderItem : orderItemService.getByOrderId(orderId)) {
-            allocatedOrderItemQuantity = orderItem.getAllocatedQuantity();
-            orderItem.setFulfilledQuantity(orderItem.getFulfilledQuantity() + allocatedOrderItemQuantity);
-            orderItem.setAllocatedQuantity(0L);
-
-            inventoryService.fulfillInInventory(orderItem.getGlobalSkuId(), allocatedOrderItemQuantity);
-        }
-        orderService.getCheckId(orderId).setStatus(OrderStatus.FULFILLED);
-    }
-
     private byte[] generateInvoicePdf(OrderPojo order) throws ApiException {
-        OrderReceiptData orderReceipt = createOrderInvoice(order);
-        return PdfGenerateUtil.generate(XmlGenerateUtil.generate(orderReceipt));
+        OrderInvoiceData orderReceipt = createOrderInvoice(order);
+        return PdfGenerateUtil.generate(XmlUtil.generate(orderReceipt));
     }
 
-    private OrderReceiptData createOrderInvoice(OrderPojo order) throws ApiException {
-        OrderReceiptData orderInvoice = new OrderReceiptData();
+    private OrderInvoiceData createOrderInvoice(OrderPojo order) throws ApiException {//instead of getting it again just pass as parameters
+        OrderInvoiceData orderInvoice = new OrderInvoiceData();
         orderInvoice.setOrderId(order.getId());
         orderInvoice.setChannelName(channelService.getName(order.getChannelId()));
         orderInvoice.setChannelOrderId(order.getChannelOrderId());
-        orderInvoice.setClientDetails(partyService.getName(order.getClientId()));
-        orderInvoice.setCustomerDetails(partyService.getName(order.getCustomerId()));
+        orderInvoice.setClientName(partyService.getName(order.getClientId()));
+        orderInvoice.setCustomerName(partyService.getName(order.getCustomerId()));
         orderInvoice.setOrderCreationTime(order.getCreatedAt().format(DateTimeFormatter.ofPattern(DateUtil.getDateFormat())));
 
-        List<OrderItemReceiptData> orderItems = new ArrayList<>();
+        List<OrderItemInvoiceData> orderItems = new ArrayList<>();
         for (OrderItemPojo orderItem : orderItemService.getByOrderId(order.getId())) {
-            OrderItemReceiptData orderItemReceipt = new OrderItemReceiptData();
+            OrderItemInvoiceData orderItemReceipt = new OrderItemInvoiceData();
 
             orderItemReceipt.setClientSkuId(productService.getCheckId(orderItem.getGlobalSkuId()).getClientSkuId());
             orderItemReceipt.setOrderItemId(orderItem.getId());
@@ -308,9 +268,9 @@ public class OrderDto extends AbstractDto {
     }
 
     private void validateOrder(OrderPojo orderPojo) throws ApiException {
-        checkTrue(partyService.getCheckId(orderPojo.getClientId()).getType().equals(ConsumerType.CLIENT), "Invalid ClientID");
-        checkTrue(partyService.getCheckId(orderPojo.getCustomerId()).getType().equals(ConsumerType.CUSTOMER), "Invalid CustomerID");
-        channelService.getCheckId(orderPojo.getChannelId());
+        checkTrue(partyService.getCheckId(orderPojo.getClientId()).getType().equals(PartyType.CLIENT), "Invalid ClientID");
+        checkTrue(partyService.getCheckId(orderPojo.getCustomerId()).getType().equals(PartyType.CUSTOMER), "Invalid CustomerID");
+        channelService.getCheckId(orderPojo.getChannelId());//check with channel name instead of id
         orderService.checkDuplicateOrders(orderPojo);
     }
 
@@ -329,7 +289,7 @@ public class OrderDto extends AbstractDto {
         for (ChannelOrderItemForm form : orderItemFormList) {
             OrderItemPojo pojo = new OrderItemPojo();
             pojo.setOrderId(orderId);
-            pojo.setGlobalSkuId(channelListingService.getByChannelChannelSkuAndClient(channelId, form.getChannelSkuId(), clientId).getGlobalSkuId());
+            pojo.setGlobalSkuId(channelListingService.getByChannelChannelSkuAndClient(channelId, form.getChannelSkuId(), clientId).getGlobalSkuId());//get the globalsku with channelsku with the help of a mapping
             pojo.setOrderedQuantity(form.getOrderedQuantity());
             orderItemList.add(pojo);
         }

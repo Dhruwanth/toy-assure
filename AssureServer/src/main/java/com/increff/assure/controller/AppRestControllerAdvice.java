@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientResponseException;
 
 @RestControllerAdvice
 public class AppRestControllerAdvice {
@@ -44,6 +45,14 @@ public class AppRestControllerAdvice {
         MessageData data = new MessageData();
         data.setMessage("Error: " + e.getMessage());
         e.printStackTrace();
+        return data;
+    }
+
+    @ExceptionHandler(RestClientResponseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public MessageData handle(RestClientResponseException e) {
+        MessageData data = new MessageData();
+        data.setMessage(e.getResponseBodyAsString());
         return data;
     }
 }

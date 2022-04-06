@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = ApiException.class)
 public class BinService extends AbstractService {
     @Autowired
     private BinDao binDao;
 
-    @Transactional(rollbackFor = ApiException.class)
     public ArrayList<Long> addBins(int numberOfBins) {
         ArrayList<Long> newBinIds = new ArrayList<>();
         for (int i = 0; i < numberOfBins; i++) {

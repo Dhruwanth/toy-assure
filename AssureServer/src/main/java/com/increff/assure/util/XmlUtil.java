@@ -1,7 +1,7 @@
 package com.increff.assure.util;
 
 import com.increff.assure.service.ApiException;
-import model.data.OrderReceiptData;
+import model.data.OrderInvoiceData;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -11,11 +11,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-public class XmlGenerateUtil {
+public class XmlUtil {
 
-    public static Document generate(OrderReceiptData orderItems) throws ApiException {
+    public static Document generate(OrderInvoiceData orderItems) throws ApiException {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(OrderReceiptData.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(OrderInvoiceData.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

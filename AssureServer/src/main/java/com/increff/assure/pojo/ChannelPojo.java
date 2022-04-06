@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "invoiceType"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})}
 )
 public class ChannelPojo extends BaseEntity {
     @Id

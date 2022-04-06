@@ -9,6 +9,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -16,6 +17,8 @@ public class ProductDao extends AbstractDao<ProductPojo> {
     ProductDao() {
         super(ProductPojo.class);
     }
+
+    private static final String SELECT_BY_GLOBAL_SKU_IDS = "select p from ProductPojo p where id IN (:globalSkuIds)";
 
     @Transactional(readOnly = true)
     public ProductPojo selectByClientIdAndClientSku(Long clientId, String clientSkuId) {
@@ -61,5 +64,15 @@ public class ProductDao extends AbstractDao<ProductPojo> {
         TypedQuery<ProductPojo> typedQuery = entityManager().createQuery(q);
         typedQuery.setParameter(clientSkuIdParam, clientSkuId);
         return typedQuery.getResultList();
+    }
+
+    public List<ProductPojo> selectByGlobalSkuIds(List<Long> globalSkuIds){
+        List<ProductPojo> finalList = new ArrayList<>();
+        for(List<Long> partitionedGlobalSkus: partition(globalSkuIds)){
+            TypedQuery<ProductPojo> q = getQuery(SELECT_BY_GLOBAL_SKU_IDS, ProductPojo.class);
+            q.setParameter("globalSkuIds", globalSkuIds);
+            finalList.addAll(q.getResultList());
+        }
+        return finalList;
     }
 }

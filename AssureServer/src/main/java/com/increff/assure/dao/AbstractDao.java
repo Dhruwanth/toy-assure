@@ -12,6 +12,7 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import static model.Constants.PARTITION_SIZE;
 
 public abstract class AbstractDao<T> {
     private final Class<T> clazz;
@@ -30,6 +31,10 @@ public abstract class AbstractDao<T> {
     protected TypedQuery<T> getQuery(String jpql, Class<T> targetClass) {
         return entityManager.createQuery(jpql, targetClass);
     }
+    
+    protected  TypedQuery<T> getQuery(String jpql) {
+		return entityManager.createQuery(jpql, clazz);
+	}
 
     protected EntityManager entityManager() {
         return entityManager;
@@ -59,6 +64,16 @@ public abstract class AbstractDao<T> {
         if (Objects.isNull(resultList))
             return new ArrayList<>();
         return resultList;
+    }
+
+    protected <T> List<List<T>> partition(List<T> list){
+        Long partitionSize = PARTITION_SIZE;
+        List<List<T>> partitions = new ArrayList<>();
+
+        for (int i=0; i<list.size(); i += partitionSize) {
+            partitions.add(list.subList(i, Math.min(i + partitionSize.intValue(), list.size())));
+        }
+        return partitions;
     }
 
     @Transactional

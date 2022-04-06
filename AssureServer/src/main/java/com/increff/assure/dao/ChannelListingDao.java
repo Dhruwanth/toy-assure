@@ -8,7 +8,9 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -16,6 +18,8 @@ public class ChannelListingDao extends AbstractDao<ChannelListingPojo> {
     ChannelListingDao() {
         super(ChannelListingPojo.class);
     }
+
+    private static String SELECT_BY_CHANNEL_ID_AND_GLOBAL_SKU_IDS = "select p from ChannelListingPojo p where channelId=:channelId AND globalSkuId IN (:globalSkuIds)";
 
     @Transactional(readOnly = true)
     public ChannelListingPojo selectByChannelAndGlobalSku(Long channelId, Long globalSkuId) {
@@ -55,17 +59,16 @@ public class ChannelListingDao extends AbstractDao<ChannelListingPojo> {
         return getSingle(typedQuery);
     }
 
-    public List<ChannelListingPojo> getSearch(Long channelId, Long clientId, String channelSkuId, Long globalSkuId) {
-        String queryStr = "SELECT c FROM ChannelListingPojo c WHERE (:clientId is null or c.clientId = :clientId) and " +
-                "(:channelSkuId is '' or c.channelSkuId = :channelSkuId) and " +
-                "(:globalSkuId is null or c.globalSkuId = :globalSkuId) and " +
-                "(:channelId is null or c.channelId = :channelId)";
-
-        TypedQuery<ChannelListingPojo> query = entityManager().createQuery(queryStr, ChannelListingPojo.class);
-        query.setParameter("clientId", clientId);
-        query.setParameter("channelId", channelId);
-        query.setParameter("globalSkuId", globalSkuId);
-        query.setParameter("channelSkuId", channelSkuId);
-        return query.getResultList();
+    public List<ChannelListingPojo> selectByChannelIdAndGlobalSkuIds(Long channelId, List<Long> globalSkuIds){
+        List<ChannelListingPojo> pojoList;
+        try{
+            TypedQuery<ChannelListingPojo> q = getQuery(SELECT_BY_CHANNEL_ID_AND_GLOBAL_SKU_IDS, ChannelListingPojo.class);
+            q.setParameter("channelId", channelId);
+            q.setParameter("globalSkuIds", globalSkuIds);
+            pojoList = q.getResultList();
+        }catch (NoResultException e){
+            pojoList = new ArrayList<>();
+        }
+        return pojoList;
     }
 }

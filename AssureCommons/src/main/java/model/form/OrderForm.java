@@ -16,7 +16,7 @@ public class OrderForm {
     private Long customerId;
 
     @NotNull
-    private Long channelId;
+    private Long channelId;//TODO use channel name 
 
     @NotNull
     @Size(min=1, max=255)

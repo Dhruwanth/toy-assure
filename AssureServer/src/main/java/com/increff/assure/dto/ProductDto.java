@@ -44,8 +44,9 @@ public class ProductDto extends AbstractDto {
         return ConvertUtil.convert(allProductMasterPojo, ProductData.class);
     }
 
-    public void update(Long clientId, String clientSku, ProductUpdateForm form) throws ApiException {
-        productService.update(clientId, clientSku, form);
+    public void update(Long id, ProductUpdateForm form) throws ApiException {
+        ProductPojo pojo = convertFormToPojo(form, id);
+        productService.update(id, pojo);
     }
 
     public ProductData getByClientAndClientSku(Long clientId, String clientSkuId) throws ApiException {
@@ -66,11 +67,17 @@ public class ProductDto extends AbstractDto {
                 errorDetailString.append("Error in Line: ").append(index + 1).append(": ").append(e.getMessage()).append("<br \\>");
             }
         }
-        checkFalse(errorDetailString.length() > 0, errorDetailString.toString());//push code to git
+        checkFalse(errorDetailString.length() > 0, errorDetailString.toString());
     }
 
     private ProductPojo convertFormToPojo(ProductForm productForm, Long clientId) throws ApiException {
         ProductPojo productPojo = ConvertUtil.convert(productForm, ProductPojo.class);
+        productPojo.setClientId(clientId);
+        return productPojo;
+    }
+    
+    private ProductPojo convertFormToPojo(ProductUpdateForm productUpdateForm, Long clientId) throws ApiException {
+        ProductPojo productPojo = ConvertUtil.convert(productUpdateForm, ProductPojo.class);
         productPojo.setClientId(clientId);
         return productPojo;
     }

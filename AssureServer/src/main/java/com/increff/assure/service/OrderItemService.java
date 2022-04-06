@@ -2,6 +2,8 @@ package com.increff.assure.service;
 
 import com.increff.assure.dao.OrderItemDao;
 import com.increff.assure.pojo.OrderItemPojo;
+import model.OrderStatus;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,17 +11,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = ApiException.class)
 public class OrderItemService extends AbstractService {
     @Autowired
     private OrderItemDao orderItemDao;
 
-    @Transactional(rollbackFor = ApiException.class)
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private OrderService orderService;
+
     public void add(OrderItemPojo orderItemPojo) throws ApiException {
         checkDuplicate(orderItemPojo);
         orderItemDao.insert(orderItemPojo);
     }
 
-    @Transactional(rollbackFor = ApiException.class)
     public void addList(List<OrderItemPojo> orderItemList) throws ApiException {
         for (OrderItemPojo orderItem : orderItemList)
             add(orderItem);
@@ -50,9 +57,19 @@ public class OrderItemService extends AbstractService {
         return orderItemDao.selectByOrderId(orderId);
     }
 
-    @Transactional(rollbackFor = ApiException.class)
     public void allocateOrderItems(OrderItemPojo orderItem, Long quantityToBeAllocated) throws ApiException {
         orderItem.setAllocatedQuantity(orderItem.getAllocatedQuantity() + quantityToBeAllocated);
+    }//TODO check the names of the variables and make necessary corrections, can pass id instead of entire orderitem
+    
+    public void fulfillOrderItems(Long orderId) throws ApiException {
+        Long allocatedOrderItemQuantity;
+        for (OrderItemPojo orderItem : getByOrderId(orderId)) {
+            allocatedOrderItemQuantity = orderItem.getAllocatedQuantity();
+            orderItem.setFulfilledQuantity(orderItem.getFulfilledQuantity() + allocatedOrderItemQuantity);
+            orderItem.setAllocatedQuantity(0L);
+
+            inventoryService.fulfillInInventory(orderItem.getGlobalSkuId(), allocatedOrderItemQuantity);
+        }
+        orderService.getCheckId(orderId).setStatus(OrderStatus.FULFILLED);
     }
 }
-

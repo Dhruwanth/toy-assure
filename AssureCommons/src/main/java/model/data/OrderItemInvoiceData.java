@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OrderItemReceiptData {
+public class OrderItemInvoiceData {
     Long orderItemId;
     String clientSkuId;
     String channelSkuId;
     Long quantity;
-    Double mrp;
+    Double mrp;//Todo change it to sellingprice
     Long total;
 }

@@ -10,8 +10,7 @@ import javax.persistence.*;
 @Setter
 @Table(uniqueConstraints={
         @UniqueConstraint(columnNames={"channelId", "globalSkuId"}),
-        @UniqueConstraint(columnNames={"channelId", "clientId", "channelSkuId"}),
-})
+        @UniqueConstraint(columnNames={"channelId", "clientId", "channelSkuId"})})
 public class ChannelListingPojo extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)

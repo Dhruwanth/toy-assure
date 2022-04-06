@@ -23,4 +23,3 @@ public class BinSkuPojo extends BaseEntity{
     @Column(nullable = false)
     private Long quantity;
 }
-//unique constraint should have a name

@@ -11,13 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = ApiException.class)
 public class ChannelService extends AbstractService {
     @Autowired
     private ChannelDao channelDao;
 
-    @Transactional(rollbackFor = ApiException.class)
     public void add(ChannelPojo channelPojo) throws ApiException {
-        channelDao.insert(channelPojo);
+    	ChannelPojo existing = channelDao.selectByName(channelPojo.getName());
+        if (existing != null) {
+            throw new ApiException("Channel with same name already exists");
+        }
+        channelDao.insert(channelPojo); 
     }
 
     public List<ChannelPojo> getAll() {

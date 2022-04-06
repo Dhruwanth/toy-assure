@@ -5,16 +5,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @XmlRootElement
-public class OrderReceiptData {
+public class OrderInvoiceData {
 
     Long orderId;
     String channelName;
     String channelOrderId;
     String orderCreationTime;
-    String clientDetails;
-    String customerDetails;
+    String clientName;
+    String customerName;
 
-    List<OrderItemReceiptData> orderItems;
+    List<OrderItemInvoiceData> orderItems;
 
     public Long getOrderId() {
         return orderId;
@@ -52,30 +52,30 @@ public class OrderReceiptData {
         this.orderCreationTime = orderCreationTime;
     }
 
-    public String getClientDetails() {
-        return clientDetails;
+    public String getClientName() {
+        return clientName;
     }
 
     @XmlElement
-    public void setClientDetails(String clientDetails) {
-        this.clientDetails = clientDetails;
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
-    public String getCustomerDetails() {
-        return customerDetails;
+    public String getCustomerName() {
+        return customerName;
     }
 
     @XmlElement
-    public void setCustomerDetails(String customerDetails) {
-        this.customerDetails = customerDetails;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
-    public List<OrderItemReceiptData> getOrderItems() {
+    public List<OrderItemInvoiceData> getOrderItems() {
         return orderItems;
     }
 
     @XmlElement
-    public void setOrderItems(List<OrderItemReceiptData> orderItems) {
+    public void setOrderItems(List<OrderItemInvoiceData> orderItems) {
         this.orderItems = orderItems;
     }
 }

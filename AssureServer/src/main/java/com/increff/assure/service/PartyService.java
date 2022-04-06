@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(rollbackFor = ApiException.class)
 public class PartyService extends AbstractService {
     @Autowired
     private PartyDao partyDao;
 
-    @Transactional(rollbackFor = ApiException.class)
     public void add(PartyPojo partyPojo) throws ApiException {
         checkIfPartyExists(partyPojo);
         partyDao.insert(partyPojo);
@@ -23,10 +23,10 @@ public class PartyService extends AbstractService {
     private void checkIfPartyExists(PartyPojo partyPojo) throws ApiException {
         checkNull(partyDao.selectByNameAndType(partyPojo.getName(), partyPojo.getType()), partyPojo.getName() + " already exists.");
     }
-//if exists already return the same entity back
+    
     public PartyPojo getCheckId(Long id) throws ApiException {
         PartyPojo consumer = partyDao.select(id);
-        checkNotNull(consumer, "Consumer (ID:" + id + ") does not exist.");
+        checkNotNull(consumer, "Party (ID:" + id + ") does not exist.");
         return consumer;
     }
 

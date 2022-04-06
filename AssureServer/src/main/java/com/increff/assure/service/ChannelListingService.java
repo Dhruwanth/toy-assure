@@ -7,31 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
+@Transactional(rollbackFor = ApiException.class)
 public class ChannelListingService extends AbstractService {
     @Autowired
     private ChannelListingDao channelListingDao;
-
-    @Transactional(rollbackFor = ApiException.class)
-    public void add(ChannelListingPojo listingPojo) throws ApiException {
-        checkDuplicateChannelListing(listingPojo);
-
-        channelListingDao.insert(listingPojo);
-    }
-
-    private void checkDuplicateChannelListing(ChannelListingPojo listingPojo) throws ApiException {
-        Long channelId = listingPojo.getChannelId();
-        Long globalSkuId = listingPojo.getGlobalSkuId();
-        String channelSkuId = listingPojo.getChannelSkuId();
-
-        ChannelListingPojo duplicateByChannelAndChannelSku = channelListingDao.selectByChannelIdChannelSkuAndClient(channelId, channelSkuId, listingPojo.getClientId());
-        checkNull(duplicateByChannelAndChannelSku, "Channel has already registered the Channel-SKU-ID: " + listingPojo.getChannelSkuId());
-
-        ChannelListingPojo duplicateByChannelAndProduct = channelListingDao.selectByChannelAndGlobalSku(channelId, globalSkuId);
-        checkNull(duplicateByChannelAndProduct, "ChannelID " + channelId + " and GSKU " + globalSkuId + " pair already exists");
-    }
-
+ 
     public List<ChannelListingPojo> getAll() {
         return channelListingDao.selectAll();
     }
@@ -42,10 +26,18 @@ public class ChannelListingService extends AbstractService {
         return listingPojo;
     }
 
-    @Transactional(rollbackFor = ApiException.class)
-    public void addList(List<ChannelListingPojo> channelListingPojos) throws ApiException {
-        for (ChannelListingPojo pojo : channelListingPojos)
-            add(pojo);
+    public void addChannelListings(List<ChannelListingPojo> channelListingPojos) throws ApiException {
+        for (ChannelListingPojo pojo : channelListingPojos) {
+        	ChannelListingPojo existingChannel = channelListingDao.selectByChannelIdChannelSkuAndClient(pojo.getChannelId(), pojo.getChannelSkuId(), pojo.getClientId());
+            if (existingChannel != null) {
+                if (existingChannel.getGlobalSkuId() == pojo.getGlobalSkuId())
+                    return;
+
+                throw new ApiException("Channel SKU:" + pojo.getChannelSkuId() + " is not valid");
+            }
+
+            channelListingDao.insert(pojo);
+        }
     }
 
     public ChannelListingPojo getByChannelIdAndGlobalSku(Long channelId, Long globalSkuId) {
@@ -56,7 +48,10 @@ public class ChannelListingService extends AbstractService {
         return channelListingDao.selectByChannelIdChannelSkuAndClient(channelId, channelSkuId, clientId);
     }
 
-    public List<ChannelListingPojo> getSearch(Long channelId, Long clientId, String channelSkuId, Long globalSkuId) {
-        return channelListingDao.getSearch(channelId, clientId, channelSkuId, globalSkuId);
+    public Map<Long, String> getByChannelIdAndGlobalSkuIds(Long channelId, List<Long> globalSkuIds){
+
+        List<ChannelListingPojo> list = channelListingDao.selectByChannelIdAndGlobalSkuIds(channelId, globalSkuIds);
+        return list.stream().collect(Collectors.toMap(value->value.getGlobalSkuId(), value->value.getChannelSkuId()));
     }
+
 }

@@ -27,26 +27,26 @@ public class ProductController {
 
     @ApiOperation(value = "Get list of all products by clientId")
     @RequestMapping(path = "/client/{clientId}", method = RequestMethod.GET)
-    public List<ProductData> getByClient(@RequestParam Long clientId) throws ApiException {
+    public List<ProductData> getByClient(@PathVariable Long clientId) throws ApiException {
         return productDto.getByClientId(clientId);
     }
 
     @ApiOperation(value = "Get a product by Client and Client SKU")
     @RequestMapping(path = "/{clientId}/{clientSkuId}", method = RequestMethod.GET)
-    public ProductData get(@RequestParam Long clientId, @RequestParam String clientSkuId) throws ApiException {
+    public ProductData get(@PathVariable Long clientId, @PathVariable String clientSkuId) throws ApiException {
         return productDto.getByClientAndClientSku(clientId, clientSkuId);
     }
 
     @ApiOperation(value = "Update a product entry")
     @RequestMapping(path = "/{clientId}/{clientSku}", method = RequestMethod.PUT)
-    public void update(@RequestParam Long clientId, @RequestParam String clientSku,
+    public void update(@PathVariable Long clientId, @PathVariable String clientSku,
                        @RequestBody ProductUpdateForm form) throws ApiException {
-        productDto.update(clientId, clientSku, form);
+        productDto.update(clientId, form);
     }
 
     @ApiOperation(value = "Validate products master list for given Client")
     @RequestMapping(path = "/validate/{clientId}", method = RequestMethod.POST)
-    public void validateList(@RequestParam Long clientId, @RequestBody List<ProductForm> formList) throws ApiException {
+    public void validateList(@PathVariable Long clientId, @RequestBody List<ProductForm> formList) throws ApiException {
         productDto.validateFormList(formList, clientId);
     }
 }
