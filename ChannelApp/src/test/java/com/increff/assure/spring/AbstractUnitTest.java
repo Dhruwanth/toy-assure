@@ -1,0 +1,20 @@
+package com.increff.assure.spring;
+
+
+
+import com.increff.assure.spring.SpringTestConfig;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.AnnotationConfigWebContextLoader;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+import javax.transaction.Transactional;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = SpringTestConfig.class, loader = AnnotationConfigWebContextLoader.class)
+@WebAppConfiguration("src/test/webapp")
+public abstract class AbstractUnitTest {
+
+}

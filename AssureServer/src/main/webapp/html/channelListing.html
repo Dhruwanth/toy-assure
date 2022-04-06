@@ -1,0 +1,116 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="snippets.html :: page_head"></head>
+
+<body>
+<nav th:replace="snippets.html :: navbar"></nav>
+
+<div style="padding-top: 10px;">
+    <div class="addressbar" style="border-bottom:1px solid #ECECEC; width:90%; margin: auto; height: 25px; font-size: 0.85em; padding-left: 15px; margin-top:3px;">
+        <a th:href="@{/}">Home</a> / Channel Listing
+    </div>
+</div>
+
+<div class="parent-container">
+    <div class="main-header">
+
+        <span data-toggle="tooltip" title="Add Channel Listing">
+            <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal" type="button">
+                <i aria-hidden="true" class="fa fa-plus"></i>
+            </button>
+        </span>
+
+    </div>
+
+    <!-- Modal -->
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add a Channel Listing Entry</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button" onclick="resetModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="channelListing-form">
+                    <div class="modal-body">
+
+                        <div class="form-group" id="channel-dropdown">
+                            <div class="" role="document">
+                                <label for="channelId" class="font-weight-bold">Channel:</label>
+                                <select class="form-control" id="channelId" name="channelId" required title="Enter a ChannelID">
+                                    <option disabled hidden selected value="">
+                                        Select a Channel
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="client-dropdown">
+                            <div class="" role="document">
+                                <label for="clientId" class="font-weight-bold">Client:</label>
+                                <select class="form-control" id="clientId" name="clientId" required title="Enter a ClientID">
+                                    <option disabled hidden selected value="">
+                                        Select a Client
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <label for="clientId" class="font-weight-bold">Channel Listing CSV:</label>
+                            <div class="modal-body" style="padding:0px; margin-bottom:35px">
+                                <div class="product-file">
+                                    <input class="custom-file-input" id="channelListingFile" required type="file">
+                                    <label class="custom-file-label" for="channelListingFile" id="channelListingFileName">Choose CSV File
+                                    </label>
+                                </div>
+                                <a target="_blank" th:href="@{/samples/channelListingCsvSample.csv}" style="float:right; margin-top:5px;">
+                                    <i class="fa fa-download" aria-hidden="true"></i> Download CSV Sample
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-warning" id="download-errors" type="button" style="visibility:hidden">Display Errors</button>
+                        <button class="btn btn-primary" id="add-channelListing" type="submit">Upload</button>
+
+                        <div id="errorDetails">
+                            <!--CSV errors appear here-->
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="body-content">
+        <div class="table-display">
+            <table class="table table-sm table-striped" id="channelListing-table" style="visibility:hidden">
+                <thead>
+                <tr>
+                    <th colspan="8">Channel Listings
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:center">ID</th>
+                    <th scope="col" style="text-align:center">Channel</th>
+                    <th scope="col" style="text-align:center">Client</th>
+                    <th scope="col">Channel SKU ID</th>
+                    <th scope="col">Client SKU ID</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="snippets.html :: footer"></footer>
+<script th:src="@{/static/channelListing.js}"></script>
+</body>
+
+</html>

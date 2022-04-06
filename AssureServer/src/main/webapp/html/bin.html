@@ -1,0 +1,186 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="snippets.html :: page_head"></head>
+
+<body>
+<nav th:replace="snippets.html :: navbar"></nav>
+
+<div style="padding-top: 10px;">
+    <div class="addressbar" style="border-bottom:1px solid #ECECEC; width:90%; margin: auto; height: 25px; font-size: 0.85em; padding-left: 15px; margin-top:3px;">
+        <a th:href="@{/}">Home</a> /
+        Bins
+    </div>
+</div>
+
+<div class="parent-container">
+    <div class="main-header">
+
+        <span data-toggle="tooltip" title="Create Bins">
+            <button class="btn btn-primary" data-target="#binCreateModal" data-toggle="modal" type="button">
+                <i aria-hidden="true" class="fa fa-plus"></i> Create Bins
+            </button>
+        </span>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn btn-primary" data-target="#binInventoryModal" data-toggle="modal" type="button">
+            <i aria-hidden="true" class="fa fa-plus"></i> Add Bin Inventory
+        </button>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn btn-primary" id="refresh-data" type="button" data-toggle="tooltip" title="Refresh">
+            <i aria-hidden="true" class="fa fa-refresh"></i>
+        </button>
+
+
+        <!--Search Param Form-->
+        <hr style="margin-top:25px">
+        <div id="search-param-div" style="margin-top:15px">
+            <form id="search-param-form">
+                <div style="font-size: 1.3em">
+                </div>
+                <div class="row" style="margin-top:10px;">
+                    <div class="form-group col-md-4">
+                        <label for="binIdSearch" class="font-weight-bold">Bin ID</label>
+                        <input class="form-control" id="binIdSearch" name="binId" pattern="[0-9]*" placeholder="Enter Bin ID" type="text" style="border:0px; border-bottom:1px solid #2B7A78;">
+                        <br>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="globalSkuSearch" class="font-weight-bold">Global SKU ID</label>
+                        <input class="form-control" id="globalSkuSearch" name="globalSkuId" pattern="[0-9]*" placeholder="Enter Global SKU ID" type="text" style="border:0px; border-bottom:1px solid #2B7A78;">
+                        <br>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="search-button">&nbsp;</label>
+                        <br />
+                        <button class="btn btn-primary" id="search-button" type="submit" data-toggle="tooltip" title="Search">
+                            <i aria-hidden="true" class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="body-content">
+        <div class="table-display">
+
+            <table class="table table-sm table-striped" id="binSku-table" style="visibility:hidden">
+                <thead>
+                <tr>
+                    <th scope="col">Bin ID</th>
+                    <th scope="col">Global SKU</th>
+                    <th scope="col" style="width:130px; text-align:center;">Quantity</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                    <!--Search results here-->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="binIdModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="binIdModalLabel">Bin Ids</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                    <table class="table table-sm table-striped" id="new-bin-info-table" style="width:50%; margin:auto">
+                        <thead>
+                        <tr>
+                            <th scope="col" style="text-align:center;">Bin ID</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bin Create Modal -->
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="binCreateModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create New Bins.</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="bin-form">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="binQuantity" class="font-weight-bold">Quantity</label>
+                            <br/>
+                            <input aria-describedby="nameHelp" class="form-control" id="binQuantity"
+                                   name="binQuantity" placeholder="Enter Number of Bins" style="width:100%; float:left;"
+                                   type="number" min="0" required pattern="[0-9]*" title="Enter a valid number" />
+                            <br/>
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="add-bin" type="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bin Inventory Modal -->
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="binInventoryModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="binInvModalLabel">Add Bin Inventory Item</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button" onclick="resetModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="binSku-form">
+                    <div class="modal-body">
+                        <div class="" role="document" style="margin-top:15px;">
+                            <div class="">
+                                <label for="binSku-upload-modal-body" class="font-weight-bold">Bin Inventory</label>
+                                <div class="modal-body" id="binSku-upload-modal-body" style="padding:0px; margin-bottom:35px">
+                                    <div class="binSku-file">
+                                        <input class="custom-file-input" id="binSkuFile" required type="file">
+                                        <label class="custom-file-label" for="binSkuFile" id="binSkuFileName">Upload CSV File
+                                        </label>
+                                    </div>
+                                    <a target="_blank" th:href="@{/samples/binSkuSample.csv}" style="float:right; margin-top:5px;">
+                                        <i class="fa fa-download" aria-hidden="true"></i> Download CSV Sample
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-warning" id="download-errors" type="button" style="visibility:hidden">Display Errors</button>
+                        <button class="btn btn-primary" id="add-binSku" type="submit">Upload</button>
+
+                        <div id="errorDetails">
+                            <!--CSV errors appear here-->
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="snippets.html :: footer"></footer>
+<script th:src="@{/static/bin.js}"></script>
+
+</body>
+
+</html>

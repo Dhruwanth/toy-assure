@@ -12,7 +12,6 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static model.Constants.PARTITION_SIZE;
 
 public abstract class AbstractDao<T> {
     private final Class<T> clazz;
@@ -66,15 +65,6 @@ public abstract class AbstractDao<T> {
         return resultList;
     }
 
-    protected <T> List<List<T>> partition(List<T> list){
-        Long partitionSize = PARTITION_SIZE;
-        List<List<T>> partitions = new ArrayList<>();
-
-        for (int i=0; i<list.size(); i += partitionSize) {
-            partitions.add(list.subList(i, Math.min(i + partitionSize.intValue(), list.size())));
-        }
-        return partitions;
-    }
 
     @Transactional
     public void insert(T object) {
