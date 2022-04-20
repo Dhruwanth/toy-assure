@@ -112,19 +112,72 @@ function resetModal() {
 }
 
 function displayNewBinInfo(response) {
-    var $tbody = $('#new-bin-info-table').find('tbody');
-    $tbody.empty();
+    console.log(response);
+    var headers = {
+                            binId: 'binId'
+                            };
+                         var itemsFormatted = [];
 
-    var arrayLength = response.length;
-    for (var i = 0; i < arrayLength; i++) {
-        console.log(i, response, response[i]);
-        var row = '<tr>' +
-            '<td style="text-align:center; font-weight: bold;">' + response[i] + '</td>' +
-            '</tr>';
-        $tbody.append(row);
+
+                        response.forEach((item) => {
+                            itemsFormatted.push({
+                                binId: item
+                            });
+                        });
+                        console.log(itemsFormatted);
+                        var z = convertToCSV(response);
+                        var today = new Date();
+                        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                        var time = today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
+                        var dateTime = date + ' ' + time;
+                        var fileTitle = 'Bins @' + dateTime;
+                        exportCSVFile(headers, itemsFormatted, fileTitle);
+}
+
+function convertToCSV(objArray) {
+    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+        for (var index in array[i]) {
+            if (line != '') line += ','
+
+            line += array[i][index];
+        }
+
+        str += line + '\r\n';
     }
 
-    $('#binIdModal').modal('show');
+    return str;
+}
+function exportCSVFile(headers, items, fileTitle) {
+    if (headers) {
+        items.unshift(headers);
+    }
+
+    // Convert Object to JSON
+    var jsonObject = JSON.stringify(items);
+    var csv = this.convertToCSV(jsonObject);
+
+    var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, exportedFilenmae);
+    } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", exportedFilenmae);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
 }
 
 function getSearchBinInventoryList() {

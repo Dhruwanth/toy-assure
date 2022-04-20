@@ -7,8 +7,8 @@ model\data\InventoryData.class
 model\data\ChannelListingData.class
 model\data\OrderItemInvoiceData.class
 model\form\ProductForm.class
+model\form\ProductSearchForm.class
 model\form\InventoryForm.class
-model\data\InvoiceResponse.class
 model\PartyType.class
 model\form\ChannelListingSearchForm.class
 model\data\BinSkuData.class
@@ -16,9 +16,7 @@ model\form\OrderValidationForm.class
 model\form\ChannelOrderItemForm.class
 model\data\OrderItemData.class
 model\form\ChannelOrderForm.class
-model\data\ChannelInvoiceProductData.class
 model\form\OrderSearchForm.class
-model\Constants.class
 model\data\PartyData.class
 model\form\OrderItemValidationForm.class
 model\OrderStatus.class
@@ -27,7 +25,6 @@ model\form\OrderItemForm.class
 model\data\ProductData.class
 model\form\OrderForm.class
 model\form\PartyForm.class
-model\data\ChannelInvoiceData.class
 model\InvoiceType.class
 model\data\MessageData.class
 model\form\ChannelForm.class

@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import model.form.ProductUpdateForm;
 
 @Service
 @Transactional(rollbackFor = ApiException.class)
@@ -31,11 +30,6 @@ public class ProductService extends AbstractService {
         return product;
     }
 
-    public Map<Long, ProductPojo> getByGlobalSkuIds(List<Long> globalSkuIds){
-        return productDao.selectByGlobalSkuIds(globalSkuIds).stream().collect(Collectors.
-                toMap(value ->value.getId(), value->value));
-    }
-
     @Transactional(rollbackFor = ApiException.class)
     public void addList(List<ProductPojo> productList) throws ApiException {
         for (ProductPojo pojo : productList)
@@ -45,13 +39,10 @@ public class ProductService extends AbstractService {
     public List<ProductPojo> getAll() {
         return productDao.selectAll();
     }
-    
-    public void update(Long id, ProductPojo updated) throws ApiException {
-        ProductPojo existing = getCheckId(id);
-        existing.setDescription(updated.getDescription());
-        existing.setBrandId(updated.getBrandId());
-        existing.setMrp(updated.getMrp());
-        existing.setName(updated.getName());
+
+    @Transactional(rollbackFor = ApiException.class)
+    public void update(Long clientId, String clientSkuId, ProductUpdateForm productForm) throws ApiException {
+        copySourceToDestination(productDao.selectByClientIdAndClientSku(clientId, clientSkuId), productForm);
     }
 
     public Long getClientIdOfProduct(Long globalSkuId) throws ApiException {
@@ -70,5 +61,8 @@ public class ProductService extends AbstractService {
 
     public List<ProductPojo> getByClientId(Long clientId) {
         return productDao.selectByClientId(clientId);
+    }
+    public List<ProductPojo> getAllByClientIdAndClientSkuId(Long clientId, String clientSkuId) throws ApiException {
+        return productDao.search(clientId, clientSkuId);
     }
 }

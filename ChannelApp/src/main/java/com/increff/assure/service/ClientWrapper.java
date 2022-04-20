@@ -7,6 +7,8 @@ import com.increff.assure.model.data.ChannelOrderInvoiceData;
 import com.increff.assure.util.ConvertUtil;
 import model.data.*;
 import model.form.ChannelOrderForm;
+import model.form.OrderItemValidationForm;
+import model.form.OrderValidationForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -27,7 +29,7 @@ public class ClientWrapper {
     HttpHeaders httpHeaders;
 
     @Value("${assure.server.url}")
-    private String assureServerUrl;//todo change to baseurl
+    private String assureServerUrl;
 
     public <T> HttpEntity<String> getHttpRequest(T object) throws ApiException {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -36,7 +38,7 @@ public class ClientWrapper {
         } catch (JsonProcessingException e) {
             throw new ApiException(e.getMessage());
         }
-    }//move to commons
+    }
 
     public void addOrder(ChannelOrderForm orderForm) throws ApiException {
         new RestTemplate().postForObject(assureServerUrl + "/api/order/channel", getHttpRequest(orderForm), String.class);
@@ -88,5 +90,13 @@ public class ClientWrapper {
 
     public void setRestTemplate(RestTemplate restTemplate){
         this.restTemplate = restTemplate;
-    }//todo if requests take more than 45 sec make it timedout
+    }
+
+    public void validateOrder(OrderValidationForm validationForm) throws ApiException {
+        new RestTemplate().postForObject(assureServerUrl + "/api/order/validate", getHttpRequest(validationForm), String.class);
+    }
+
+    public void validateOrderItem(OrderItemValidationForm validationForm) throws ApiException {
+        new RestTemplate().postForObject(assureServerUrl + "/api/order/orderItem/channel/validate", getHttpRequest(validationForm), String.class);
+    }
 }

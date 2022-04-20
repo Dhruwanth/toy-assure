@@ -44,7 +44,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add a Product</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button" onclick="resetModal()">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -53,7 +53,7 @@
                     <div class="modal-body">
 
                         <div class="form-group" id="client-dropdown">
-                            <label for="clientId" class="font-weight-bold">Client</label>
+                            <label for="clientId" class="font-weight-bold">Client:</label>
                             <select class="form-control" id="clientId" name="clientId" required title="Select a Client">
                                 <option disabled hidden selected value="">
                                     Select a Client
@@ -62,14 +62,14 @@
 
                             <div class="" role="document" style="margin-top:15px;">
                                 <div class="">
-                                    <label for="product-upload-modal-body" class="font-weight-bold">Product </label>
+                                    <label for="product-upload-modal-body" class="font-weight-bold">Product</label>
                                     <div class="modal-body" id="product-upload-modal-body" style="padding:0px; margin-bottom:35px">
                                         <div class="product-file">
                                             <input class="custom-file-input" id="productFile" required type="file">
                                             <label class="custom-file-label" for="productFile" id="productFileName">Upload CSV File
                                             </label>
                                         </div>
-                                        <a style="float:right; margin-top:5px;" target="_blank" th:href="@{/samples/productCsvSample.csv}">
+                                        <a style="float:right; margin-top:5px;" target="_blank" href="http://127.0.0.1:9090/sample/productCsvSample.csv">
                                             <i aria-hidden="true" class="fa fa-download"></i> Download CSV Sample
                                         </a>
                                     </div>
@@ -81,7 +81,7 @@
                     <div class="modal-footer">
                         <button class="btn btn-warning" id="download-errors" type="button" style="visibility:hidden">Display Errors
                         </button>
-                        <button class="btn btn-primary" id="process-data" type="submit">Upload</button>
+                        <button class="btn btn-primary" id="process-data" type="submit">Submit</button>
 
                         <div id="errorDetails">
                             <!--CSV errors appear here-->
@@ -95,7 +95,7 @@
 
     <div class="body-content">
         <div class="table-display" style="margin-top:15px;">
-            <table class="table table-sm table-striped" id="product-table" style = "table-layout:fixed; width:100%; overflow:hidden;word-wrap:break-word;">
+            <table class="table table-sm table-striped" id="product-table" style = "table-layout:fixed; width:100%; overflow:hidden;word-wrap:break-word; ">
                 <thead>
                 <tr>
                     </th>
@@ -106,7 +106,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">BrandID</th>
                     <th scope="col">MRP</th>
-                    <th scope="col">Desc.</th>
+                    <th scope="col">Description</th>
                     <th scope="col" style="text-align:right">Actions</th>
                 </tr>
                 </thead>
@@ -146,7 +146,7 @@
                         <div class="form-group" style="width: 100%; margin-top:5px;">
                             <div class="col-sm-3 col-form-label" style="text-align:right">MRP</div>
                             <div class="col-sm-9">
-                                <input class="form-control" name="mrp" pattern="[0-9]*" placeholder="Enter MRP" required style="float:left; width:100%" title="MRP should be a positive number" type="text">
+                                <input class="form-control" name="mrp" pattern="[0-9]*" placeholder="Enter MRP" required style="float:left; width:100%" title="Enter a Valid MRP" type="text">
                             </div>
                         </div>
                         <div class="form-group" style="width: 100%; margin-top:5px;">
@@ -157,7 +157,6 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="width: 100%; margin-top: 25px;  padding-bottom: 10px;">
-                        <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
                         <button class="btn btn-primary" id="update-product" type="submit">Update</button>
                     </div>
                 </form>

@@ -21,7 +21,7 @@ public class PartyService extends AbstractService {
     }
 
     private void checkIfPartyExists(PartyPojo partyPojo) throws ApiException {
-        checkNull(partyDao.selectByNameAndType(partyPojo.getName(), partyPojo.getType()), partyPojo.getName() + " already exists.");
+        checkNull(partyDao.selectByNameAndType(partyPojo.getName(), partyPojo.getType()), partyPojo.getType()+" with name "+partyPojo.getName() + " already exists.");
     }
     
     public PartyPojo getCheckId(Long id) throws ApiException {

@@ -5,10 +5,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,13 +68,25 @@ public class ProductDao extends AbstractDao<ProductPojo> {
         return typedQuery.getResultList();
     }
 
-    public List<ProductPojo> selectByGlobalSkuIds(List<Long> globalSkuIds){
-        List<ProductPojo> finalList = new ArrayList<>();
-        for(List<Long> partitionedGlobalSkus: partition(globalSkuIds)){
-            TypedQuery<ProductPojo> q = getQuery(SELECT_BY_GLOBAL_SKU_IDS, ProductPojo.class);
-            q.setParameter("globalSkuIds", globalSkuIds);
-            finalList.addAll(q.getResultList());
+    public List<ProductPojo> search(Long clientId, String clientSkuId) {
+        List<ProductPojo> pojoList = new ArrayList<>();
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductPojo> cq = cb.createQuery(ProductPojo.class);
+
+        Root<ProductPojo> root = cq.from(ProductPojo.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (clientSkuId == null) {
+            predicates.add(cb.equal(root.get("clientId"), clientId));
+        } else {
+            predicates.add(cb.equal(root.get("clientId"), clientId));
+            predicates.add(cb.equal(root.get("clientSkuId"), clientSkuId));
         }
-        return finalList;
+
+        cq.where(predicates.toArray(new Predicate[0]));
+        Query query = entityManager.createQuery(cq);
+        pojoList = query.getResultList();
+        return pojoList;
     }
 }

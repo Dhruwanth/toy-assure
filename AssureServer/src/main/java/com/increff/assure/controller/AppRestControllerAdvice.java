@@ -47,14 +47,6 @@ public class AppRestControllerAdvice {
         e.printStackTrace();
         return data;
     }
-
-    @ExceptionHandler(RestClientResponseException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public MessageData handle(RestClientResponseException e) {
-        MessageData data = new MessageData();
-        data.setMessage(e.getResponseBodyAsString());
-        return data;
-    }
 }
 
 

@@ -1,0 +1,174 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="snippets.html :: page_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: navbar"></nav>
+
+<div style="padding-top: 10px;">
+    <div class="addressbar" style="border-bottom:1px solid #ECECEC; width:90%; margin: auto; height: 25px; font-size: 0.85em; padding-left: 15px; margin-top:3px;">
+        <a th:href="@{/}">Home</a> /
+        Products
+    </div>
+</div>
+
+<div class="parent-container">
+    <div class="main-header">
+
+        <button class="btn btn-primary" id="refresh-data" type="button" data-toggle="tooltip" title="Refresh">
+            <i aria-hidden="true" class="fa fa-refresh"></i>
+        </button>
+        <span data-toggle="tooltip" title="Add Product Master">
+            <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal" type="button">
+                <i aria-hidden="true" class="fa fa-plus"></i>
+            </button>
+        </span>
+
+            <div class="col-12" style="margin-top: 2%;">
+                <form class="form-inline" id="productSearch-form" style="font-weight:600;">
+                    Client Name &nbsp; <select class="form-control" id="selectClient"
+                            name='clientId'>
+                            <option selected hidden disabled value="">Select name</option>
+                        </select>
+                        <input type="text" class="form-control" style="margin-left: 1%"
+                        name="clientSkuId" id="clientSkuId"
+                        placeholder="Enter ClientSkuId"> &nbsp;
+                        <button type="button" class="btn btn-info" id="display-products"
+                            style="margin-left: 1%">Search</button>
+                </form>
+            </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add a Product</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button" onclick="resetModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="product-form">
+                    <div class="modal-body">
+
+                        <div class="form-group" id="client-dropdown">
+                            <label for="clientId" class="font-weight-bold">Client:</label>
+                            <select class="form-control" id="clientId" name="clientId" required title="Select a Client">
+                                <option disabled hidden selected value="">
+                                    Select a Client
+                                </option>
+                            </select>
+
+                            <div class="" role="document" style="margin-top:15px;">
+                                <div class="">
+                                    <label for="product-upload-modal-body" class="font-weight-bold">Products</label>
+                                    <div class="modal-body" id="product-upload-modal-body" style="padding:0px; margin-bottom:35px">
+                                        <div class="product-file">
+                                            <input class="custom-file-input" id="productFile" required type="file">
+                                            <label class="custom-file-label" for="productFile" id="productFileName">Upload CSV File
+                                            </label>
+                                        </div>
+                                        <a style="float:right; margin-top:5px;" target="_blank" href="http://127.0.0.1:9090/sample/productCsvSample.csv">
+                                            <i aria-hidden="true" class="fa fa-download"></i> Download CSV Sample
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-warning" id="download-errors" type="button" style="visibility:hidden">Display Errors
+                        </button>
+                        <button class="btn btn-secondary" data-dismiss="modal" type="button" onclick="resetModal()">Close</button>
+                        <button class="btn btn-primary" id="process-data" type="submit">Upload</button>
+
+                        <div id="errorDetails">
+                            <!--CSV errors appear here-->
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="body-content">
+        <div class="table-display" style="margin-top:15px;">
+            <table class="table table-sm table-striped" id="product-table" style = "table-layout:fixed; width:100%; overflow:hidden;word-wrap:break-word; ">
+                <thead>
+                <tr>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col" style="text-align:center">ID</th>
+                    <th scope="col">ClientSKU</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">BrandID</th>
+                    <th scope="col">MRP</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" style="text-align:right">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- product Edit Modal -->
+    <div class="modal" id="edit-product-modal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i aria-hidden="true" class="fa fa-wrench"></i>
+                        Edit Product Details
+                    </h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="form-inline" id="product-edit-form">
+                    <div class="modal-body">
+                        <div class="form-group" style="width: 100%; margin-top:5px;">
+                            <div class="col-sm-3 col-form-label" style="text-align:right;">Name</div>
+                            <div class="col-sm-9">
+                                <input class="form-control" name="name" placeholder="Enter Name" required style="float:left; width:100%" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group" style="width: 100%; margin-top:5px;">
+                            <div class="col-sm-3 col-form-label" style="text-align:right">Brand ID</div>
+                            <div class="col-sm-9">
+                                <input class="form-control" name="brandId" placeholder="Enter Brand ID" required style="float:left; width:100%" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group" style="width: 100%; margin-top:5px;">
+                            <div class="col-sm-3 col-form-label" style="text-align:right">MRP</div>
+                            <div class="col-sm-9">
+                                <input class="form-control" name="mrp" pattern="[0-9]*" placeholder="Enter MRP" required style="float:left; width:100%" title="Enter a Valid MRP" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group" style="width: 100%; margin-top:5px;">
+                            <div class="col-sm-3 col-form-label" style="text-align:right">Description</div>
+                            <div class="col-sm-9">
+                                <input class="form-control" name="description" placeholder="Enter Description" required style="float:left; width:100%" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="width: 100%; margin-top: 25px;  padding-bottom: 10px;">
+                        <button class="btn btn-primary" id="update-product" type="submit">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="snippets.html :: footer"></footer>
+<script th:src="@{/static/product.js}"></script>
+</body>
+
+</html>

@@ -17,7 +17,7 @@ public abstract class AbstractDao<T> {
     private final Class<T> clazz;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    protected EntityManager entityManager;
 
     public AbstractDao(Class<T> clazz) {
         this.clazz = clazz;

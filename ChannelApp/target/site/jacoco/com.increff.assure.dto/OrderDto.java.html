@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ChannelApp</a> &gt; <a href="index.source.html" class="el_package">com.increff.assure.dto</a> &gt; <span class="el_source">OrderDto.java</span></div><h1>OrderDto.java</h1><pre class="source lang-java linenums">package com.increff.assure.dto;
+
+import com.increff.assure.model.data.ChannelOrderInvoiceData;
+import com.increff.assure.service.ApiException;
+import com.increff.assure.service.ClientWrapper;
+import com.increff.assure.util.PdfGenerateUtil;
+import com.increff.assure.util.XmlGenerateUtil;
+import model.data.*;
+import model.form.ChannelOrderForm;
+import model.form.OrderItemValidationForm;
+import model.form.OrderValidationForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+import java.util.Base64;
+
+@Service
+<span class="nc" id="L20">public class OrderDto {</span>
+    @Autowired
+    private ClientWrapper clientWrapper;
+
+    public void add(@RequestBody ChannelOrderForm orderForm) throws ApiException {
+<span class="nc" id="L25">        clientWrapper.addOrder(orderForm);</span>
+<span class="nc" id="L26">    }</span>
+
+    public ChannelInvoiceResponse generateInvoice(OrderInvoiceData orderReceiptData) throws ApiException {
+<span class="nc" id="L29">        ChannelOrderInvoiceData orderReceipt = clientWrapper.convert(orderReceiptData);</span>
+<span class="nc" id="L30">        ChannelInvoiceResponse invoice = new ChannelInvoiceResponse();</span>
+<span class="nc" id="L31">        invoice.setData(Base64.getEncoder().encodeToString(PdfGenerateUtil.generate(XmlGenerateUtil.generate(orderReceipt))));</span>
+<span class="nc" id="L32">        return invoice;</span>
+    }
+
+
+    public List&lt;PartyData&gt; getAllClients() {
+<span class="nc" id="L37">        return clientWrapper.getClients();</span>
+    }
+
+    public List&lt;ChannelData&gt; getAllChannels() {
+<span class="nc" id="L41">        return clientWrapper.getChannels();</span>
+    }
+
+    public List&lt;OrderData&gt; getByChannel(Long channelId) throws ApiException {
+<span class="nc" id="L45">        return clientWrapper.getOrdersByChannel(channelId);</span>
+    }
+
+    public List&lt;OrderItemData&gt; getByOrderId(Long orderId) {
+<span class="nc" id="L49">        return clientWrapper.getOrderItems(orderId);</span>
+    }
+
+    public void validateOrderForm(OrderValidationForm validationForm) throws ApiException {
+<span class="nc" id="L53">        clientWrapper.validateOrder(validationForm);</span>
+<span class="nc" id="L54">    }</span>
+
+    public void validateOrderItemForm(OrderItemValidationForm validationForm) throws ApiException {
+<span class="nc" id="L57">        clientWrapper.validateOrderItem(validationForm);</span>
+<span class="nc" id="L58">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

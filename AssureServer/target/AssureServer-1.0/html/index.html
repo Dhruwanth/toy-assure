@@ -1,0 +1,68 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="snippets.html :: page_head"></head>
+
+<body>
+<nav th:replace="snippets.html :: navbar"></nav>
+
+<div style="padding-top: 10px;">
+    <div class="addressbar" style="border-bottom:1px solid #ECECEC; width:90%; margin: auto; height: 25px; font-size: 0.85em; padding-left: 15px; margin-top:3px;">
+        Home
+    </div>
+</div>
+
+<div class="row" style="width:90%; padding-top: 25px; margin: auto;">
+    <div class="col-sm-1"></div>
+
+    <div class="col-sm-5">
+        <div style="color:#880808">
+            <i class="fa fa-user" aria-hidden="true" style="font-size: 40px"></i>
+            <a th:href="@{/consumer}"><span style="font-size: 25px;">&nbspParties</span></a>
+        </div>
+    </div>
+
+    <div class="col-sm-5">
+        <div style="color:#880808">
+            <i class="fa fa-cubes" aria-hidden="true" style="font-size: 35px"></i>
+            <a th:href="@{/product}"><span style="font-size: 25px;">Products</span></a>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="width:90%; padding-top: 40px; margin: auto;">
+    <div class="col-sm-1"></div>
+
+    <div class="col-sm-5">
+        <div style="color:#880808">
+            <i class="fa fa-shopping-basket" aria-hidden="true" style="font-size: 40px"></i>
+            <a th:href="@{/bin}"><span style="font-size: 25px;">&nbspBins</span></a>
+        </div>
+    </div>
+
+    <div class="col-sm-5">
+        <div style="color:#880808">
+            <i class="fa fa-clipboard" aria-hidden="true" style="font-size: 40px"></i>
+            <a th:href="@{/channel}"><span style="font-size: 25px;">&nbspChannels</span></a>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="width:90%; padding-top: 40px; margin: auto;">
+    <div class="col-sm-1"></div>
+
+
+    <div class="col-sm-5">
+        <div style="color:#880808">
+            <i class="fa fa-shopping-cart" aria-hidden="true" style="font-size: 35px"></i>
+            <a th:href="@{/order}"><span style="font-size: 25px;">Orders</span></a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="snippets.html :: footer"></footer>
+<script th:src="@{/static/bin.js}"></script>
+
+</body>
+
+</html>

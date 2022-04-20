@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChannelOrderInvoiceData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ChannelApp</a> &gt; <a href="index.source.html" class="el_package">com.increff.assure.model.data</a> &gt; <span class="el_source">ChannelOrderInvoiceData.java</span></div><h1>ChannelOrderInvoiceData.java</h1><pre class="source lang-java linenums">package com.increff.assure.model.data;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+@XmlRootElement
+<span class="nc" id="L8">public class ChannelOrderInvoiceData {</span>
+
+    Long orderId;
+    String channelName;
+    String channelOrderId;
+    String orderCreationTime;
+    String clientDetails;
+    String customerDetails;
+
+    List&lt;ChannelOrderItemInvoiceData&gt; orderItems;
+
+    public Long getOrderId() {
+<span class="nc" id="L20">        return orderId;</span>
+    }
+
+    @XmlElement
+    public void setOrderId(Long orderId) {
+<span class="nc" id="L25">        this.orderId = orderId;</span>
+<span class="nc" id="L26">    }</span>
+
+    public String getChannelName() {
+<span class="nc" id="L29">        return channelName;</span>
+    }
+
+    @XmlElement
+    public void setChannelName(String channelName) {
+<span class="nc" id="L34">        this.channelName = channelName;</span>
+<span class="nc" id="L35">    }</span>
+
+    public String getChannelOrderId() {
+<span class="nc" id="L38">        return channelOrderId;</span>
+    }
+
+    @XmlElement
+    public void setChannelOrderId(String channelOrderId) {
+<span class="nc" id="L43">        this.channelOrderId = channelOrderId;</span>
+<span class="nc" id="L44">    }</span>
+
+    public String getOrderCreationTime() {
+<span class="nc" id="L47">        return orderCreationTime;</span>
+    }
+
+    @XmlElement
+    public void setOrderCreationTime(String orderCreationTime) {
+<span class="nc" id="L52">        this.orderCreationTime = orderCreationTime;</span>
+<span class="nc" id="L53">    }</span>
+
+    public String getClientDetails() {
+<span class="nc" id="L56">        return clientDetails;</span>
+    }
+
+    @XmlElement
+    public void setClientDetails(String clientDetails) {
+<span class="nc" id="L61">        this.clientDetails = clientDetails;</span>
+<span class="nc" id="L62">    }</span>
+
+    public String getCustomerDetails() {
+<span class="nc" id="L65">        return customerDetails;</span>
+    }
+
+    @XmlElement
+    public void setCustomerDetails(String customerDetails) {
+<span class="nc" id="L70">        this.customerDetails = customerDetails;</span>
+<span class="nc" id="L71">    }</span>
+
+    public List&lt;ChannelOrderItemInvoiceData&gt; getOrderItems() {
+<span class="nc" id="L74">        return orderItems;</span>
+    }
+
+    @XmlElement
+    public void setOrderItems(List&lt;ChannelOrderItemInvoiceData&gt; orderItems) {
+<span class="nc" id="L79">        this.orderItems = orderItems;</span>
+<span class="nc" id="L80">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

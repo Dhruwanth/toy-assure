@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClientWrapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ChannelApp</a> &gt; <a href="index.source.html" class="el_package">com.increff.assure.service</a> &gt; <span class="el_source">ClientWrapper.java</span></div><h1>ClientWrapper.java</h1><pre class="source lang-java linenums">package com.increff.assure.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.increff.assure.model.data.ChannelOrderItemInvoiceData;
+import com.increff.assure.model.data.ChannelOrderInvoiceData;
+import com.increff.assure.util.ConvertUtil;
+import model.data.*;
+import model.form.ChannelOrderForm;
+import model.form.OrderItemValidationForm;
+import model.form.OrderValidationForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@Component
+<span class="nc" id="L23">public class ClientWrapper {</span>
+    @Autowired
+    RestTemplate restTemplate;
+    @Autowired
+    ObjectMapper mapper;
+    @Autowired
+    HttpHeaders httpHeaders;
+
+    @Value(&quot;${assure.server.url}&quot;)
+    private String assureServerUrl;
+
+    public &lt;T&gt; HttpEntity&lt;String&gt; getHttpRequest(T object) throws ApiException {
+<span class="nc" id="L35">        httpHeaders.setContentType(MediaType.APPLICATION_JSON);</span>
+        try {
+<span class="nc" id="L37">            return new HttpEntity&lt;&gt;(mapper.writeValueAsString(object), httpHeaders);</span>
+<span class="nc" id="L38">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L39">            throw new ApiException(e.getMessage());</span>
+        }
+    }
+
+    public void addOrder(ChannelOrderForm orderForm) throws ApiException {
+<span class="nc" id="L44">        new RestTemplate().postForObject(assureServerUrl + &quot;/api/order/channel&quot;, getHttpRequest(orderForm), String.class);</span>
+<span class="nc" id="L45">    }</span>
+
+    public ChannelOrderInvoiceData convert(OrderInvoiceData orderInvoiceData) throws ApiException {
+<span class="nc" id="L48">        ChannelOrderInvoiceData channelInvoice = ConvertUtil.convert(orderInvoiceData, ChannelOrderInvoiceData.class);</span>
+<span class="nc" id="L49">        List&lt;ChannelOrderItemInvoiceData&gt; channelInvoiceItemList = new ArrayList&lt;&gt;(ConvertUtil.convert(orderInvoiceData.getOrderItems(), ChannelOrderItemInvoiceData.class));</span>
+<span class="nc" id="L50">        channelInvoice.setOrderItems(channelInvoiceItemList);</span>
+<span class="nc" id="L51">        return channelInvoice;</span>
+    }
+
+    public List&lt;OrderData&gt; getOrdersByChannel(Long channelId) throws ApiException {
+<span class="nc" id="L55">        String urlGETList = assureServerUrl + &quot;/api/order/channel/&quot;+channelId;</span>
+
+<span class="nc" id="L57">        ResponseEntity&lt;OrderData[]&gt; responseEntity = new RestTemplate().getForEntity(urlGETList, OrderData[].class);</span>
+<span class="nc" id="L58">        OrderData[] objects = responseEntity.getBody();</span>
+<span class="nc" id="L59">        List&lt;OrderData&gt; orderDataList = Arrays.asList(objects);</span>
+
+<span class="nc" id="L61">        return ConvertUtil.convert(orderDataList, OrderData.class);</span>
+    }
+
+    public List&lt;PartyData&gt; getClients() {
+<span class="nc" id="L65">        String urlGETList = assureServerUrl + &quot;/api/party/clients&quot;;</span>
+
+<span class="nc" id="L67">        ResponseEntity&lt;PartyData[]&gt; responseEntity = new RestTemplate().getForEntity(urlGETList, PartyData[].class);</span>
+<span class="nc" id="L68">        PartyData[] objects = responseEntity.getBody();</span>
+
+<span class="nc" id="L70">        return Arrays.asList(objects);</span>
+    }
+
+    public List&lt;ChannelData&gt; getChannels() {
+<span class="nc" id="L74">        String urlGETList = assureServerUrl + &quot;/api/channel&quot;;</span>
+
+<span class="nc" id="L76">        ResponseEntity&lt;ChannelData[]&gt; responseEntity = new RestTemplate().getForEntity(urlGETList, ChannelData[].class);</span>
+<span class="nc" id="L77">        ChannelData[] objects = responseEntity.getBody();</span>
+
+<span class="nc" id="L79">        return Arrays.asList(objects);</span>
+    }
+
+    public List&lt;OrderItemData&gt; getOrderItems(Long orderId) {
+<span class="nc" id="L83">        String urlGETList = assureServerUrl + &quot;/api/order/orderItem/orderId/&quot;+orderId;</span>
+
+<span class="nc" id="L85">        ResponseEntity&lt;OrderItemData[]&gt; responseEntity = new RestTemplate().getForEntity(urlGETList, OrderItemData[].class);</span>
+<span class="nc" id="L86">        OrderItemData[] objects = responseEntity.getBody();</span>
+
+<span class="nc" id="L88">        return Arrays.asList(objects);</span>
+    }
+
+    public void setRestTemplate(RestTemplate restTemplate){
+<span class="nc" id="L92">        this.restTemplate = restTemplate;</span>
+<span class="nc" id="L93">    }</span>
+
+    public void validateOrder(OrderValidationForm validationForm) throws ApiException {
+<span class="nc" id="L96">        new RestTemplate().postForObject(assureServerUrl + &quot;/api/order/validate&quot;, getHttpRequest(validationForm), String.class);</span>
+<span class="nc" id="L97">    }</span>
+
+    public void validateOrderItem(OrderItemValidationForm validationForm) throws ApiException {
+<span class="nc" id="L100">        new RestTemplate().postForObject(assureServerUrl + &quot;/api/order/orderItem/channel/validate&quot;, getHttpRequest(validationForm), String.class);</span>
+<span class="nc" id="L101">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

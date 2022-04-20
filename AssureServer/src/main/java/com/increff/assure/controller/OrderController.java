@@ -57,6 +57,12 @@ public class OrderController {
         return orderDto.getSearch(form);
     }
 
+    @ApiOperation(value = "search order by Order ID")
+    @RequestMapping(path = "/search/{orderId}", method = RequestMethod.GET)
+    public OrderData searchByOrderId(@PathVariable Long orderId) throws ApiException {
+        return orderDto.searchByOrderId(orderId);
+    }
+
     @ApiOperation(value = "Gets list of all Order-Items")
     @RequestMapping(path = "/orderItem/orderId/{orderId}", method = RequestMethod.GET)
     public List<OrderItemData> getAll(@PathVariable Long orderId) throws ApiException {

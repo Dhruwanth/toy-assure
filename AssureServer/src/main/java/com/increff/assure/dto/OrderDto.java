@@ -6,6 +6,7 @@ import com.increff.assure.service.*;
 import com.increff.assure.util.DateUtil;
 import com.increff.assure.util.PdfGenerateUtil;
 import com.increff.assure.util.XmlUtil;
+import com.increff.assure.util.ConvertUtil;
 import model.PartyType;
 import model.InvoiceType;
 import model.OrderStatus;
@@ -139,7 +140,7 @@ public class OrderDto extends AbstractDto {
             orderItemService.fulfillOrderItems(orderId);
 
         if (channelService.getInvoiceType(order.getChannelId()).equals(InvoiceType.SELF))
-            return Base64.getEncoder().encodeToString(generateInvoicePdf(order));//maintain idempotency for fulfilled orders
+            return Base64.getEncoder().encodeToString(generateInvoicePdf(order));
 
         return clientWrapper.fetchInvoiceFromChannel(createOrderInvoice(order));
     }
@@ -149,7 +150,7 @@ public class OrderDto extends AbstractDto {
         return PdfGenerateUtil.generate(XmlUtil.generate(orderReceipt));
     }
 
-    private OrderInvoiceData createOrderInvoice(OrderPojo order) throws ApiException {//instead of getting it again just pass as parameters
+    private OrderInvoiceData createOrderInvoice(OrderPojo order) throws ApiException {
         OrderInvoiceData orderInvoice = new OrderInvoiceData();
         orderInvoice.setOrderId(order.getId());
         orderInvoice.setChannelName(channelService.getName(order.getChannelId()));
@@ -231,6 +232,10 @@ public class OrderDto extends AbstractDto {
 
         return convertPojoToData(orderService.getSearch(form.getClientId(),
                 form.getCustomerId(), form.getChannelId(), dateList[0], dateList[1]));
+    }
+
+    public OrderData searchByOrderId(Long orderId) throws ApiException {
+        return ConvertUtil.convert(orderService.getCheckOrderId(orderId), OrderData.class);
     }
 
     public List<OrderItemData> getByOrderId(Long orderId) throws ApiException {

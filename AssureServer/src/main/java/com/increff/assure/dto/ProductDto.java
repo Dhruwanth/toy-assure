@@ -8,6 +8,7 @@ import com.increff.assure.util.ConvertUtil;
 import com.increff.assure.util.NormalizeUtil;
 import model.data.ProductData;
 import model.form.ProductForm;
+import model.form.ProductSearchForm;
 import model.form.ProductUpdateForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,9 +45,8 @@ public class ProductDto extends AbstractDto {
         return ConvertUtil.convert(allProductMasterPojo, ProductData.class);
     }
 
-    public void update(Long id, ProductUpdateForm form) throws ApiException {
-        ProductPojo pojo = convertFormToPojo(form, id);
-        productService.update(id, pojo);
+    public void update(Long clientId, String clientSku, ProductUpdateForm form) throws ApiException {
+        productService.update(clientId, clientSku, form);
     }
 
     public ProductData getByClientAndClientSku(Long clientId, String clientSkuId) throws ApiException {
@@ -55,6 +55,13 @@ public class ProductDto extends AbstractDto {
 
     public List<ProductData> getByClientId(Long clientId) throws ApiException {
         return ConvertUtil.convert(productService.getByClientId(clientId), ProductData.class);
+    }
+
+    public List<ProductData> getAllByClientIdAndClientSkuId(ProductSearchForm form) throws ApiException {
+        validateSearchForm(form);
+        List<ProductPojo> pojoList = productService.getAllByClientIdAndClientSkuId(form.getClientId(), form.getClientSkuId());
+        return ConvertUtil.convert(pojoList, ProductData.class);
+
     }
 
     public void validateFormList(List<ProductForm> formList, Long clientId) throws ApiException {
@@ -80,5 +87,11 @@ public class ProductDto extends AbstractDto {
         ProductPojo productPojo = ConvertUtil.convert(productUpdateForm, ProductPojo.class);
         productPojo.setClientId(clientId);
         return productPojo;
+    }
+
+    private void validateSearchForm(ProductSearchForm form) {
+        if (form.getClientSkuId().isEmpty()) {
+            form.setClientSkuId(null);
+        }
     }
 }

@@ -14,11 +14,9 @@ import java.io.*;
 public class PdfGenerateUtil {
 
     public static final String RESOURCES_DIR;
-    public static final String OUTPUT_DIR;
 
     static {
         RESOURCES_DIR = "C://Users//Dhruwanth Reddy//toy_assure//AssureServer//src//main//resources//";
-        OUTPUT_DIR = "C://Users//Dhruwanth Reddy//toy_assure//AssureServer//src//main//resources//output//";
     }
 
     public static byte[] generate(Document file) throws ApiException {

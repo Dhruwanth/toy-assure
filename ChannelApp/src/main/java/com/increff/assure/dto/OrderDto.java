@@ -7,6 +7,8 @@ import com.increff.assure.util.PdfGenerateUtil;
 import com.increff.assure.util.XmlGenerateUtil;
 import model.data.*;
 import model.form.ChannelOrderForm;
+import model.form.OrderItemValidationForm;
+import model.form.OrderValidationForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,5 +43,17 @@ public class OrderDto {
 
     public List<OrderData> getByChannel(Long channelId) throws ApiException {
         return clientWrapper.getOrdersByChannel(channelId);
+    }
+
+    public List<OrderItemData> getByOrderId(Long orderId) {
+        return clientWrapper.getOrderItems(orderId);
+    }
+
+    public void validateOrderForm(OrderValidationForm validationForm) throws ApiException {
+        clientWrapper.validateOrder(validationForm);
+    }
+
+    public void validateOrderItemForm(OrderItemValidationForm validationForm) throws ApiException {
+        clientWrapper.validateOrderItem(validationForm);
     }
 }

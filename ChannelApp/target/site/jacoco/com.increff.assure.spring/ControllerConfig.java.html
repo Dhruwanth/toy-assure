@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControllerConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ChannelApp</a> &gt; <a href="index.source.html" class="el_package">com.increff.assure.spring</a> &gt; <span class="el_source">ControllerConfig.java</span></div><h1>ControllerConfig.java</h1><pre class="source lang-java linenums">package com.increff.assure.spring;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+@Configuration
+@EnableWebMvc
+@EnableSwagger2
+<span class="nc" id="L43">public class ControllerConfig extends WebMvcConfigurerAdapter {</span>
+
+    public static final String PACKAGE_CONTROLLER = &quot;com.increff.assure.controller&quot;;
+
+    private ApplicationContext applicationContext;
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+<span class="nc" id="L50">        this.applicationContext = applicationContext;</span>
+<span class="nc" id="L51">    }</span>
+
+    @Bean
+    public Docket api() {
+<span class="nc" id="L55">        return new Docket(DocumentationType.SWAGGER_2)//</span>
+<span class="nc" id="L56">                .useDefaultResponseMessages(false)//</span>
+<span class="nc" id="L57">                .select().apis(RequestHandlerSelectors.basePackage(PACKAGE_CONTROLLER))//</span>
+<span class="nc" id="L58">                .paths(PathSelectors.regex(&quot;/api/.*&quot;))//</span>
+<span class="nc" id="L59">                .build();</span>
+    }
+
+    // Add configuration for Swagger
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+<span class="nc" id="L65">        registry.addResourceHandler(&quot;/swagger-ui.html&quot;).addResourceLocations(&quot;classpath:/META-INF/resources/&quot;);</span>
+<span class="nc" id="L66">        registry.addResourceHandler(&quot;/webjars/**&quot;).addResourceLocations(&quot;classpath:/META-INF/resources/webjars/&quot;);</span>
+<span class="nc" id="L67">        registry.addResourceHandler(&quot;/static/**&quot;).addResourceLocations(&quot;/static/&quot;);</span>
+<span class="nc" id="L68">    }</span>
+
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+<span class="nc" id="L72">        configurer.enable();</span>
+<span class="nc" id="L73">    }</span>
+
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+<span class="nc" id="L77">        SpringTemplateEngine engine = new SpringTemplateEngine();</span>
+<span class="nc" id="L78">        engine.setEnableSpringELCompiler(true);</span>
+<span class="nc" id="L79">        engine.setTemplateResolver(templateResolver());</span>
+<span class="nc" id="L80">        return engine;</span>
+    }
+
+    @Bean
+    public ThymeleafViewResolver viewResolver() {
+<span class="nc" id="L85">        ThymeleafViewResolver resolver = new ThymeleafViewResolver();</span>
+<span class="nc" id="L86">        resolver.setTemplateEngine(templateEngine());</span>
+<span class="nc" id="L87">        resolver.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+<span class="nc" id="L88">        return resolver;</span>
+    }
+
+    @Bean
+    public HttpHeaders httpHeaders(){
+<span class="nc" id="L93">        return new HttpHeaders();</span>
+    }
+
+    @Bean
+    public ITemplateResolver templateResolver() {
+<span class="nc" id="L98">        SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();</span>
+<span class="nc" id="L99">        resolver.setApplicationContext(applicationContext);</span>
+<span class="nc" id="L100">        resolver.setPrefix(&quot;/html/&quot;);</span>
+<span class="nc" id="L101">        resolver.setTemplateMode(TemplateMode.HTML);</span>
+<span class="nc" id="L102">        return resolver;</span>
+    }
+
+    @Bean
+    @Autowired
+    public ObjectMapper objectMapper() {
+<span class="nc" id="L108">        JavaTimeModule javaTimeModule = new JavaTimeModule();</span>
+<span class="nc" id="L109">        javaTimeModule.addSerializer(ZonedDateTime.class,</span>
+<span class="nc" id="L110">                new ZonedDateTimeSerializer(DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;)));</span>
+<span class="nc" id="L111">        javaTimeModule.addDeserializer(ZonedDateTime.class,</span>
+                new ZonedDateTimeDeserializer());
+<span class="nc" id="L113">        ObjectMapper objMapper = Jackson2ObjectMapperBuilder.json().featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // ISODate</span>
+<span class="nc" id="L114">                .modules(javaTimeModule).build();</span>
+<span class="nc" id="L115">        return objMapper;</span>
+    }
+
+    public MappingJackson2HttpMessageConverter customJackson2HttpMessageConverter(ObjectMapper mapper) {
+<span class="nc" id="L119">        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();</span>
+<span class="nc" id="L120">        jsonConverter.setObjectMapper(mapper);</span>
+<span class="nc" id="L121">        return jsonConverter;</span>
+    }
+
+    @Override
+    public void configureMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) {
+<span class="nc" id="L126">        converters.add(customJackson2HttpMessageConverter(objectMapper()));</span>
+<span class="nc" id="L127">        super.configureMessageConverters(converters);</span>
+<span class="nc" id="L128">    }</span>
+
+    @Bean
+    public RestTemplate restTemplate() {
+<span class="nc" id="L132">        List&lt;HttpMessageConverter&lt;?&gt;&gt; convertors = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L133">        convertors.add(customJackson2HttpMessageConverter(objectMapper()));</span>
+<span class="nc" id="L134">        RestTemplate restTemplate = new RestTemplate();</span>
+<span class="nc" id="L135">        restTemplate.setMessageConverters(convertors);</span>
+<span class="nc" id="L136">        return restTemplate;</span>
+    }
+
+<span class="nc" id="L139">    public class ZonedDateTimeDeserializer extends JsonDeserializer&lt;ZonedDateTime&gt; {</span>
+        @Override
+        public ZonedDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+                throws IOException {
+<span class="nc" id="L143">            return ZonedDateTime.parse(</span>
+<span class="nc" id="L144">                    jsonParser.getText(),</span>
+                    DateTimeFormatter.ISO_OFFSET_DATE_TIME
+            );
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

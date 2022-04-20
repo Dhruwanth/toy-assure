@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseNamingUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ChannelApp</a> &gt; <a href="index.source.html" class="el_package">com.increff.assure.util</a> &gt; <span class="el_source">DatabaseNamingUtil.java</span></div><h1>DatabaseNamingUtil.java</h1><pre class="source lang-java linenums">package com.increff.assure.util;
+
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+
+<span class="nc" id="L7">public class DatabaseNamingUtil extends PhysicalNamingStrategyStandardImpl {</span>
+
+<span class="nc" id="L9">    public static final DatabaseNamingUtil INSTANCE = new DatabaseNamingUtil();</span>
+    public static final String CAMEL_CASE_REGEX = &quot;([a-z]+)([A-Z]+)&quot;;
+    public static final String SNAKE_CASE_PATTERN = &quot;$1\\_$2&quot;;
+    public static final String TABLE_NAME_PREFIX = &quot;assure_&quot;;
+
+    @Override
+    public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
+<span class="nc" id="L16">        String formattedName = TABLE_NAME_PREFIX + formatIdentifierText(super.toPhysicalTableName(name, context));</span>
+<span class="nc" id="L17">        return Identifier.toIdentifier(formattedName, name.isQuoted());</span>
+    }
+
+    @Override
+    public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment context) {
+<span class="nc" id="L22">        String formattedName = formatIdentifierText(super.toPhysicalTableName(name, context));</span>
+<span class="nc" id="L23">        return Identifier.toIdentifier(formattedName, name.isQuoted());</span>
+    }
+
+    private String formatIdentifierText(Identifier identifier) {
+<span class="nc" id="L27">        String name = identifier.getText();</span>
+<span class="nc" id="L28">        return name</span>
+<span class="nc" id="L29">                .replaceAll(</span>
+                        CAMEL_CASE_REGEX,
+                        SNAKE_CASE_PATTERN)
+<span class="nc" id="L32">                .toLowerCase();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

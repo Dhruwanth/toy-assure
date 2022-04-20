@@ -8,6 +8,7 @@ com\increff\assure\spring\DbConfig.class
 com\increff\assure\dao\AbstractDao.class
 com\increff\assure\model\form\ChannelOrderItemForm.class
 com\increff\assure\util\DatabaseNamingUtil.class
+com\increff\assure\util\XmlGenerateUtil.class
 com\increff\assure\spring\ControllerConfig$ZonedDateTimeDeserializer.class
 com\increff\assure\model\data\MessageData.class
 com\increff\assure\model\data\ChannelOrderInvoiceData.class
@@ -22,7 +23,6 @@ com\increff\assure\util\StringUtil.class
 com\increff\assure\spring\RestConfig.class
 com\increff\assure\model\form\ChannelAppOrderForm.class
 com\increff\assure\util\ConvertUtil.class
-com\increff\assure\util\XmlUtil.class
 com\increff\assure\spring\ControllerConfig.class
 com\increff\assure\controller\AppUiController.class
 com\increff\assure\model\data\ChannelOrderItemInvoiceData.class

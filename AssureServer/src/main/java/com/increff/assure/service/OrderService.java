@@ -62,6 +62,14 @@ public class OrderService extends AbstractService {
         return orderDao.getSearch(clientId, customerId, channelId, fromDate, toDate);
     }
 
+    public OrderPojo getCheckOrderId(Long orderId) throws ApiException {
+        OrderPojo orderPojo = orderDao.select(orderId);
+
+        if (orderPojo == null)
+            throw new ApiException("Order doesn't exist");
+        return orderPojo;
+    }
+
     public void updateFulfilledQty(Long orderId){
         List<OrderItemPojo> list = orderItemDao.selectByOrderId(orderId);
         for(OrderItemPojo orderItemPojo: list){

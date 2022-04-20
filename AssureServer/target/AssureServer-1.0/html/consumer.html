@@ -1,0 +1,121 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="snippets.html :: page_head"></head>
+
+<body>
+<nav th:replace="snippets.html :: navbar"></nav>
+
+<div style="padding-top: 10px;">
+    <div class="addressbar" style="border-bottom:1px solid #ECECEC; width:90%; margin: auto; height: 25px; font-size: 0.85em; padding-left: 15px; margin-top:3px;">
+        <a th:href="@{/}">Home</a> /
+        Parties
+    </div>
+</div>
+
+<div class="parent-container">
+    <div class="main-header">
+
+        <button class="btn btn-primary" data-toggle="tooltip" id="refresh-data" title="Refresh" type="button">
+            <i aria-hidden="true" class="fa fa-refresh"></i>
+        </button>
+        <span data-toggle="tooltip" title="Add Party">
+            <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal" type="button">
+                <i aria-hidden="true" class="fa fa-plus"></i>
+            </button>
+        </span>
+
+        <!--Search Param Form-->
+        <hr class="mt-4">
+        <div id="search-param-div" style="margin-top:15px">
+            <form id="search-param-form">
+                <div class="row" style="margin-top:10px;">
+                    <div class="form-group col-md-4">
+                        <label class="font-weight-bold" for="consumerTypeSearch">Party Type</label>
+                        <select class="form-control" id="consumerTypeSearch" name="type" required style="border:0px; border-bottom:1px solid #2B7A78;" title="Select a Party Type">
+                            <option value="clients">CLIENT</option>
+                            <option value="customers">CUSTOMER</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="search-button">&nbsp;</label>
+                        <br/>
+                        <button class="btn btn-primary" data-toggle="tooltip" id="search-button" title="Search" type="submit">
+                            <i aria-hidden="true" class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Party</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form id="consumer-form">
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="consumerName">Name</label>
+                            <input aria-describedby="nameHelp" class="form-control" id="consumerName" name="name" pattern=".*\S+.*" placeholder="Enter Name" required title="This field is required" type="text">
+                            <small class="form-text text-muted" id="nameHelp">Name should be unique.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="font-weight-bold" for="consumerType">Party Type</label>
+                            <select class="form-control" id="consumerType" name="type" required title="Select a Party Type">
+                                <option disabled hidden selected value="">
+                                    Select Party Type
+                                </option>
+                                <option value="CLIENT">Client</option>
+                                <option value="CUSTOMER">Customer</option>
+                            </select>
+                            <br>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="add-consumer" type="submit">Add</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="body-content" style="padding-top:0px; margin-top:0px;">
+        <div class="table-display" style="padding-top:0px">
+            <table class="table table-sm table-striped" id="consumer-table" style="visibility:hidden">
+
+                <thead>
+                <tr>
+                    <th scope="col" style="width:180px; text-align:center;">ID</th>
+                    <th scope="col" style="width:180px;">Name</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                    <!--Consumer Table Rows here-->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="snippets.html :: footer"></footer>
+
+<script th:src="@{/static/consumer.js}"></script>
+
+</body>
+
+</html>

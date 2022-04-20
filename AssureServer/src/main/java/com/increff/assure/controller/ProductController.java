@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import model.data.ProductData;
 import model.form.ProductForm;
+import model.form.ProductSearchForm;
 import model.form.ProductUpdateForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,12 +42,18 @@ public class ProductController {
     @RequestMapping(path = "/{clientId}/{clientSku}", method = RequestMethod.PUT)
     public void update(@PathVariable Long clientId, @PathVariable String clientSku,
                        @RequestBody ProductUpdateForm form) throws ApiException {
-        productDto.update(clientId, form);
+        productDto.update(clientId, clientSku, form);
     }
 
     @ApiOperation(value = "Validate products master list for given Client")
     @RequestMapping(path = "/validate/{clientId}", method = RequestMethod.POST)
     public void validateList(@PathVariable Long clientId, @RequestBody List<ProductForm> formList) throws ApiException {
         productDto.validateFormList(formList, clientId);
+    }
+
+    @ApiOperation(value = "Get all products by clientId and clientSkuId")
+    @RequestMapping(path = "/client", method = RequestMethod.POST)
+    public List<ProductData> getAllProductsByClientIdAndClientSkuId(@RequestBody ProductSearchForm form) throws ApiException {
+        return productDto.getAllByClientIdAndClientSkuId(form);
     }
 }
